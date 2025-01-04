@@ -1,3 +1,5 @@
+from celery import Celery
+from kombu import Exchange, Queue
 
 
 # USE THIS FOR PASTEBIN https://pastebin.com/K2E7qRBk
@@ -51,7 +53,7 @@ def add(x, y):
 # YOU CAN NOW USE THIS FOR PASTEBIN: https://pastebin.com/Nz9HZuAB
 
 # Try executing with this code 
-from celery_tasks import add
+#from celery_tasks import add
 
 if __name__ == '__main__':
     try:
