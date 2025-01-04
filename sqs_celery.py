@@ -1,24 +1,22 @@
 from celery import Celery
 from kombu import Exchange, Queue
-
-
-# USE THIS FOR PASTEBIN https://pastebin.com/K2E7qRBk
-
-# Solution for BUG
+import os
 
 # Initialize Celery app
 app = Celery(
     'cel',
     broker='sqs://',
-    backend='celery_s3.backends.S3Backend',
+    backend='celery.backends.s3.S3Backend',
 )
 
-# Broker transport options
+# Load AWS credentials from environment variables or IAM role
 app.conf.broker_transport_options = {
     'visibility_timeout': 3600,  # Timeout for SQS messages
     'task_create_missing_queues': False,  # Prevent auto-creation of queues
     'region': 'eu-central-1',  # AWS region
     'queue_name_prefix': 'cel-',  # Prefix for queue names
+    'aws_access_key_id': os.getenv('AWS_ACCESS_KEY_ID'),
+    'aws_secret_access_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
     'endpoint_url': 'https://sqs.eu-central-1.amazonaws.com',  # Custom endpoint
 }
 
@@ -26,6 +24,8 @@ app.conf.broker_transport_options = {
 app.conf.CELERY_S3_BACKEND_SETTINGS = {
     'bucket': 'celery_back',  # S3 bucket for backend
     'region': 'eu-central-1',  # AWS region
+    'aws_access_key_id': os.getenv('AWS_ACCESS_KEY_ID'),
+    'aws_secret_access_key': os.getenv('AWS_SECRET_ACCESS_KEY'),
     'endpoint_url': 'https://s3.eu-central-1.amazonaws.com',  # Custom endpoint
 }
 
@@ -44,11 +44,10 @@ app.conf.task_routes = {
 app.conf.broker_connection_retry_on_startup = True
 
 # Define a sample task
-
-
 @app.task
 def add(x, y):
     return x + y
+
 
 # YOU CAN NOW USE THIS FOR PASTEBIN: https://pastebin.com/Nz9HZuAB
 
