@@ -82,3 +82,20 @@ app.conf.broker_connection_retry_on_startup = True
 @app.task
 def add(x, y):
     return x + y
+
+
+# Try executing with this code 
+from celery_tasks import add
+
+if __name__ == '__main__':
+    try:
+        # Asynchronously send the task to the specified queue
+        result = add.apply_async(args=(10, 20), queue='queue1')
+        print(f'Task ID: {result.id}')
+        
+        # Retrieve the result with a timeout
+        task_result = result.get(timeout=60)
+        print(f'Task result: {task_result}')
+    except Exception as e:
+        print(f"An error occurred while executing the task: {e}")
+
